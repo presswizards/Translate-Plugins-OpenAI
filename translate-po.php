@@ -4,6 +4,10 @@ Efficiently translates an entire .po file at once using OpenAI API.
 Usage: php translate-po.php API-KEY-HERE
 
 The source language is always "en". The destination languages are defined in the script as an array of country codes (e.g., "es", "fr", "de", "it").
+
+Reference:
+• English → en.po • Spanish → es.po • German → de.po • French → fr.po • Italian → it.po • Portuguese → pt.po • Dutch → nl.po • Russian → ru.po • Chinese (Simplified) → zh_CN.po • Japanese → ja.po • Korean → ko.po • Arabic → ar.po • Turkish → tr.po • Hindi → hi.po • Polish → pl.po • Swedish → sv.po • Danish → da.po • Finnish → fi.po • Greek → el.po • Czech → cs.po • Hungarian → hu.po • Thai → th.po • Hebrew → he.po
+
 */
 
 if ($argc < 2) {
