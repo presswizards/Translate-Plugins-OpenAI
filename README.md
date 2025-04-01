@@ -1,6 +1,11 @@
 # Translate-Plugins-OpenAI
 Translate your plugin's .po file from English to other languages using OpenAI models via this simple PHP script!
 
+<p/>
+<a href="https://www.buymeacoffee.com/robwpdev" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a><br>
+If this plugin saves you time, helps your clients, or helps you do better work, I’d appreciate it.
+</p>
+
 ## Useage
 
 - Replace en.po with your plugin's en.po file.
@@ -14,3 +19,8 @@ It will loop through the country codes, saving out the .po files for each countr
 ## Language Reference
 
 • English → en.po • Spanish → es.po • German → de.po • French → fr.po • Italian → it.po • Portuguese → pt.po • Dutch → nl.po • Russian → ru.po • Chinese (Simplified) → zh_CN.po • Japanese → ja.po • Korean → ko.po • Arabic → ar.po • Turkish → tr.po • Hindi → hi.po • Polish → pl.po • Swedish → sv.po • Danish → da.po • Finnish → fi.po • Greek → el.po • Czech → cs.po • Hungarian → hu.po • Thai → th.po • Hebrew → he.po
+
+<p/>
+<a href="https://www.buymeacoffee.com/robwpdev" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a><br>
+If this plugin saves you time, helps your clients, or helps you do better work, I’d appreciate it.
+</p>
