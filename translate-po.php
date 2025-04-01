@@ -12,7 +12,8 @@ if ($argc < 2) {
 
 $api_key = $argv[1];
 $source_lang = "en";
-$target_languages = ["es", "fr", "de", "it"]; // Add or modify target languages as needed
+$target_languages = ["es", "fr", "de", "it"];
+//$target_languages = ["es", "fr", "de", "it", "pt", "nl", "ru", "zh_CN", "ja", "ko", "ar", "tr", "hi", "pl", "sv", "da", "fi", "el", "cs", "hu", "th", "he"];
 
 $source_po = "{$source_lang}.po";
 
