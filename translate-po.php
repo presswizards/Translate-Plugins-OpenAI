@@ -1,24 +1,20 @@
 <?php
 /*
 Efficiently translates an entire .po file at once using OpenAI API.
-Usage: php translate-po.php en es API-KEY-HERE
+Usage: php translate-po.php API-KEY-HERE
 
-For short options page strings (like UI labels, button text, settings names), GPT-4o-mini is good enough. It’s faster and cheaper, and short phrases don’t require deep context handling.
-
-However, if some strings have subtle meanings (e.g., “Post” could mean a blog post or mailing a letter), GPT-4o would be more accurate.
-If cost isn’t a concern, GPT-4o ensures better precision. Otherwise, GPT-4o-mini should work fine for basic UI translations. 🚀
+The source language is always "en". The destination languages are defined in the script as an array of country codes (e.g., "es", "fr", "de", "it").
 */
 
-if ($argc < 4) {
-    die("Usage: php translate-po.php en es API-KEY-HERE\n");
+if ($argc < 2) {
+    die("Usage: php translate-po.php API-KEY-HERE\n");
 }
 
-$source_lang = $argv[1];
-$target_lang = $argv[2];
-$api_key = $argv[3];
+$api_key = $argv[1];
+$source_lang = "en";
+$target_languages = ["es", "fr", "de", "it"]; // Add or modify target languages as needed
 
 $source_po = "{$source_lang}.po";
-$target_po = "{$target_lang}.po";
 
 function translate_po($source_po, $target_po, $target_lang, $api_key) {
     if (!file_exists($source_po)) {
@@ -71,4 +67,8 @@ function translate_po($source_po, $target_po, $target_lang, $api_key) {
     echo "Translated PO file saved as $target_po\n";
 }
 
-translate_po($source_po, $target_po, $target_lang, $api_key);
+// Loop through each target language and translate
+foreach ($target_languages as $target_lang) {
+    $target_po = "{$target_lang}.po";
+    translate_po($source_po, $target_po, $target_lang, $api_key);
+}
