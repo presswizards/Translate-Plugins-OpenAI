@@ -20,16 +20,22 @@ $api_key = $argv[3];
 $source_po = "{$source_lang}.po";
 $target_po = "{$target_lang}.po";
 
-function translate_bulk($texts, $target_lang, $api_key) {
-    if (empty($texts)) return [];
+function translate_po($source_po, $target_po, $target_lang, $api_key) {
+    if (!file_exists($source_po)) {
+        die("Source PO file {$source_po} not found.\n");
+    }
 
+    // Read the entire source .po file
+    $source_content = file_get_contents($source_po);
+
+    // Prepare the API request
     $messages = [
-        ['role' => 'system', 'content' => "Translate the following texts to {$target_lang}, keeping them in the same order and preserving context for software localization. Return the response as a JSON array."],
-        ['role' => 'user', 'content' => json_encode($texts)]
+        ['role' => 'system', 'content' => "Translate the following gettext .po file content to {$target_lang}. Ensure the output is in valid .po file format, preserving all metadata, msgid, and msgstr structures. Multi-line msgid and msgstr blocks must be formatted correctly, including max length formatting. Do not add po or code formatting or extra blank lines at the top or bottom of the file, it will be saved just as sent back."],
+        ['role' => 'user', 'content' => $source_content]
     ];
 
     $data = [
-        'model' => 'gpt-4o-mini',
+        'model' => 'gpt-4o',
         'messages' => $messages,
         'temperature' => 0.3
     ];
@@ -46,74 +52,23 @@ function translate_bulk($texts, $target_lang, $api_key) {
     $response = curl_exec($ch);
     curl_close($ch);
 
-    $decoded = json_decode($response, true);
-
-    // Ensure the response is properly decoded
-    $translated_texts = json_decode($decoded['choices'][0]['message']['content'] ?? '[]', true);
-
-    if (!is_array($translated_texts) || count($translated_texts) !== count($texts)) {
-        echo "Translation response invalid. Response received:\n" . $decoded['choices'][0]['message']['content'] . "\n";
-        return array_fill(0, count($texts), '');
+    if (!$response) {
+        die("Error: No response from OpenAI API.\n");
     }
 
-    return $translated_texts;
-}
+    $decoded = json_decode($response, true);
 
-function translate_po($source_po, $target_po, $target_lang, $api_key) {
-        if (!file_exists($source_po)) {
-                die("Source PO file {$source_po} not found.\n");
-        }
+    if (!isset($decoded['choices'][0]['message']['content'])) {
+        die("Error: Unexpected API response format. Full response:\n$response\n");
+    }
 
-        $lines = file($source_po);
-        $msgids = [];
-        $msgid_map = [];
-        $processed_lines = [];
+    // Clean up the translated content to remove extra blank lines
+    $translated_content = trim($decoded['choices'][0]['message']['content']);
 
-        // Collect all msgid entries for batch translation
-        foreach ($lines as $line) {
-                if (strpos($line, 'msgid "') === 0) {
-                        $msgid = trim(substr($line, 7), "\"\n");
-                        $msgids[] = $msgid;
-                        $msgid_map[$msgid] = ''; // Initialize map
-                }
-        }
+    // Write the cleaned translated content to the target .po file
+    file_put_contents($target_po, $translated_content);
 
-        // Get translations in bulk
-        $translations = translate_bulk($msgids, $target_lang, $api_key);
-
-        // Debug output for mismatch issue
-        if (count($translations) !== count($msgids)) {
-                echo "Warning: Mismatch between msgid count (".count($msgids).") and translations (".count($translations).").\n";
-        }
-
-        // Map translations back to the msgids
-        $i = 0;
-        foreach ($msgid_map as $key => &$value) {
-                $value = trim($translations[$i++] ?? '');
-
-                // If the translation is empty, you can skip or set a placeholder
-                if (empty($value)) {
-                        $value = "[TRANSLATION MISSING FOR {$key}]";  // Optional placeholder for missing translation
-                }
-        }
-
-        // Reconstruct PO file with translated msgstr values
-        $msgid = '';
-        foreach ($lines as $line) {
-                if (strpos($line, 'msgid "') === 0) {
-                        $msgid = trim(substr($line, 7), "\"\n");
-                        $processed_lines[] = $line;
-                } elseif (strpos($line, 'msgstr ""') === 0 && $msgid !== '') {
-                        $translated_value = isset($msgid_map[$msgid]) ? $msgid_map[$msgid] : '';
-                        $processed_lines[] = 'msgstr "' . addslashes($translated_value) . "\"\n\n";
-                        $msgid = ''; // Reset msgid after translation
-                } else {
-                        $processed_lines[] = $line;
-                }
-        }
-
-        file_put_contents($target_po, implode('', $processed_lines));
-        echo "Translated PO file saved as $target_po\n";
+    echo "Translated PO file saved as $target_po\n";
 }
 
 translate_po($source_po, $target_po, $target_lang, $api_key);
